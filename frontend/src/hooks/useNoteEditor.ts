@@ -264,6 +264,28 @@ export function useNoteEditor() {
     setIsEditing(prev => !prev);
   };
 
+  const discardChanges = () => {
+    // Przywróć oryginalny stan notatki
+    if (noteFromStore) {
+      setDraftNote({
+        title: noteFromStore.title,
+        content: noteFromStore.content,
+        tags: noteFromStore.tags || [],
+        isPinned: noteFromStore.isPinned
+      });
+    } else if (currentNoteId === "new") {
+      setDraftNote({
+        title: "",
+        content: "",
+        tags: [],
+        isPinned: false
+      });
+    }
+    
+    // Wyjdź z trybu edycji
+    setIsEditing(false);
+  };
+
   const handlePreviewDoubleClick = () => {
     setIsEditing(true);
   };
@@ -294,6 +316,7 @@ export function useNoteEditor() {
     handleDelete,
     handleSave,
     toggleEditMode,
+    discardChanges,
     handlePreviewDoubleClick,
     toggleNotePinStatus,
   };

@@ -113,12 +113,22 @@ export function AiAssistantDialog({
 
   const handleInsertResult = (result: string) => {
     const currentNote = getCurrentNote();
+    console.log("currentNote", currentNote);
     if (currentNote) {
-      // Aktualizuj treść notatki, dodając wynik AI
       updateNote(currentNote.id, {
         content: currentNote.content
           ? `${currentNote.content}\n\n${result}`
           : result,
+      });
+    }
+    onOpenChange(false);
+  };
+
+  const handleOverrideResult = (result: string) => {
+    const currentNote = getCurrentNote();
+    if (currentNote) {
+      updateNote(currentNote.id, {
+        content: result,
       });
     }
     onOpenChange(false);
@@ -172,7 +182,10 @@ export function AiAssistantDialog({
           </div>
         ) : (
           <div className="flex-1 flex flex-col space-y-4 overflow-hidden">
-            <AiAssistanceTab onInsertResult={handleInsertResult} />
+            <AiAssistanceTab
+              onInsertResult={handleInsertResult}
+              onOverrideResult={handleOverrideResult}
+            />
           </div>
         )}
 

@@ -16,9 +16,13 @@ interface AiFeature {
 
 interface AiAssistanceTabProps {
   onInsertResult: (result: string) => void;
+  onOverrideResult: (result: string) => void;
 }
 
-export function AiAssistanceTab({ onInsertResult }: AiAssistanceTabProps) {
+export function AiAssistanceTab({
+  onInsertResult,
+  onOverrideResult,
+}: AiAssistanceTabProps) {
   const [result, setResult] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
@@ -216,6 +220,10 @@ Analysis:`,
     onInsertResult(result);
   };
 
+  const handleOverrideResult = () => {
+    onOverrideResult(result);
+  };
+
   return (
     <div className="grid gap-4 mt-4">
       <div>
@@ -255,9 +263,12 @@ Analysis:`,
           <ScrollArea className="h-[150px] border rounded-md p-3 bg-muted/20">
             <div className="whitespace-pre-wrap text-sm">{result}</div>
           </ScrollArea>
-          <Button onClick={handleInsertResult} className="self-end">
-            Insert into Note
-          </Button>
+          <div className="flex gap-2 self-end">
+            <Button variant="outline" onClick={handleOverrideResult}>
+              Replace Note
+            </Button>
+            <Button onClick={handleInsertResult}>Add to Note</Button>
+          </div>
         </div>
       )}
     </div>

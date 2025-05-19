@@ -32,6 +32,7 @@ export function NoteEditor() {
     handleDelete,
     handleSave,
     toggleEditMode,
+    discardChanges,
     handlePreviewDoubleClick,
     setDeleteDialogOpen,
     isPinned,
@@ -39,7 +40,11 @@ export function NoteEditor() {
   } = useNoteEditor();
 
   useUnsavedChangesWarning(hasUnsavedChanges);
-  useSaveShortcut({ onSave: handleSave, onClose: toggleEditMode });
+  useSaveShortcut({
+    onSave: handleSave,
+    onClose: toggleEditMode,
+    onDiscard: discardChanges,
+  });
 
   if (!note && !isEditing) {
     return <div className="p-4">Loading...</div>;
