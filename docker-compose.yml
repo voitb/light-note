@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" # Exposes Nginx on host port 80
+    depends_on:
+      - backend
+    # We'll need to add a custom nginx.conf to proxy to the backend
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001" # For local access during dev/debug, not strictly needed if only accessed via frontend proxy
+    environment:
+      # Define any necessary environment variables for your backend
+      # NODE_ENV: production
+      # PORT: 3001 # Ensure this matches what your backend app listens on and what Dockerfile EXPOSEs
+      # DATABASE_URL: ...
+    # If your backend needs a .env file, you can mount it or use compose environment section
+    # env_file:
+    #   - ./backend/.env
+
+# Optional: Define named volumes if you need persistent storage (e.g., for a database)
+# volumes:
+#   db_data: 

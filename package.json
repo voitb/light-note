@@ -1,0 +1,11 @@
+{
+  "name": "light-note-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend dev\"",
+    "install:all": "pnpm install --recursive"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 

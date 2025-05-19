@@ -1,0 +1,29 @@
+import { Moon, Sun } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useUserStore } from "@/lib/store/user-store"
+
+export function ThemeToggle() {
+  const { preferences, updatePreferences } = useUserStore()
+  
+  const toggleTheme = () => {
+    const newTheme = preferences.theme === "dark" ? "light" : "dark"
+    
+    // Apply DOM changes immediately - no delay
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(newTheme);
+    
+    // Then update the store
+    requestAnimationFrame(() => {
+      updatePreferences({ theme: newTheme })
+    });
+  }
+
+  return (
+    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleTheme}>
+      <Sun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  )
+} 

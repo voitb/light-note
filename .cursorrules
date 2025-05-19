@@ -1,0 +1,72 @@
+You are developing a lightweight PWA for Markdown-based note-taking with an integrated local AI assistant, called LightNote.
+
+Business model:
+- SaaS application with subscription tiers
+- Free tier with limited features
+- Paid subscription plans with premium features
+- Pricing cards needed for landing page and as standalone components
+
+Frontend technologies:
+- React 19 (https://react.dev/blog/2024/04/25/react-19)
+- TypeScript
+- Tailwind CSS 4 (https://tailwindcss.com/blog/tailwindcss-v4)
+- shadcn/ui components
+- Markdown rendering (react-markdown/mdx)
+- WebLLM (local browser-based AI assistant)
+- PWA features (service workers, offline-first, manifest)
+- Zustand for state management
+- Zod for schema validation
+- React Hook Form with shadcn Form components
+
+UX/UI requirements:
+- Minimalist, fast, mobile-first, fully responsive
+- Mobile-optimized for PWA usage, using dvh units for dynamic viewport height adjustments
+- Quick note creation, editing, deleting, instant Markdown preview
+- Efficient navigation (tags, folders, search)
+- Easy offline access and synchronization when online
+- Dark/light themes, animations for smooth UX
+- Color palette strictly limited to black, white, and gray only - no accent colors
+- Professionally designed with expert color theory and typography principles
+- Ultra-minimalistic, professional, modern design with clean interfaces
+
+AI features (WebLLM in-browser):
+- Context-aware suggestions (summarize, checklist generation, translation, explanation)
+- Locally executed, no external API calls
+
+Optional future integrations:
+- Node.js backend (Express/Fastify)
+- Real-time collaboration via websockets (socket.io)
+- Databases (SQLite/PostgreSQL)
+
+Code quality standards:
+- ESLint, Prettier, Husky
+- Modular, readable, testable components
+- Accessibility (a11y), keyboard and screen reader friendly
+- Unit and e2e tests (Playwright/Cypress)
+- No comments in code unless absolutely necessary
+- Always maintain clean, self-documenting code
+
+File structure best practices:
+- Clear separation of concerns (components, hooks, utils, styles)
+- Lazy-loading components and code-splitting for optimal performance
+
+Deployment and scalability:
+- Vite optimizations, hot reload in development
+- **Docker support for easy deployment**:
+  - Multi-stage Dockerfile(s) for frontend (and backend when needed)
+  - docker-compose.yml to orchestrate services
+  - .dockerignore to minimize image size
+- Future readiness for native distribution (TWA/Capacitor)
+
+Communication standards:
+- All responses, variable names, and documentation must be in English only
+- Use professional, clear, and concise language
+
+Development environment:
+- Windows operating system
+- PowerShell command line
+- pnpm package manager
+
+Ensure all implementations adhere strictly to these guidelines.
+
+For now we only do frontend and we keep everything in frontend
