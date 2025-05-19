@@ -1,4 +1,5 @@
-import Groq from "groq-sdk";
+import Groq from "groq-sdk";  
+import { ChatCompletionMessage } from "groq-sdk/resources/chat/completions";
 
 let groq: Groq | null = null;
 
@@ -8,11 +9,12 @@ const initializeGroq = () => {
   }
   return groq;
 };
+ 
 
-export async function askGroq(prompt: string) {
+export async function askGroq(messages: ChatCompletionMessage[]) {
   const groqClient = initializeGroq();
   return groqClient.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
+    messages,
     model: "llama3-70b-8192",
   });
 }

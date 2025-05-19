@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { askGroq } from "../services/groqServices";
+import { ChatCompletionMessage } from "groq-sdk/resources/chat/completions";
 
 export default async function groqRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -8,19 +9,28 @@ export default async function groqRoutes(fastify: FastifyInstance) {
       schema: {
         body: {
           type: "object",
-          required: ["prompt"],
+          required: ["messages"],
           properties: {
-            prompt: { type: "string", minLength: 1, maxLength: 2000 },
+            messages: { 
+              type: "array",
+              items: {
+                type: "object",
+                required: ["role", "content"],
+                properties: {
+                  role: { type: "string", enum: ["system", "user", "assistant"] },
+                  content: { type: "string" }
+                }
+              }
+            },
           },
         },
       },
     },
     async (request, reply) => {
-      console.log("request hejaa", request);
-      const { prompt } = request.body as { prompt: string };
+      const { messages } = request.body as { messages: ChatCompletionMessage[] };
 
       try {
-        const response = await askGroq(prompt);
+        const response = await askGroq(messages);
         reply.send(response);
       } catch (error: any) {
         fastify.log.error(error);
