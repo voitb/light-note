@@ -5,6 +5,7 @@ import { NotesList } from "./NotesList";
 import { TagsSection } from "./TagsSection";
 import { UserProfileSection } from "./UserProfileSection";
 import { SearchDialog } from "./search-dialog";
+import { DeleteNoteDialog } from "./DeleteNoteDialog";
 
 export function NotesSidebar() {
   const {
@@ -18,11 +19,15 @@ export function NotesSidebar() {
     setSearchDialogOpen,
     settingsDialogOpen,
     setSettingsDialogOpen,
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+    noteToDelete,
     effectiveNoteId,
     effectiveUserId,
     filteredNotes,
     allTags,
     openDeleteDialog,
+    handleDeleteNote,
     toggleTheme,
     getUserInitials,
     currentUser,
@@ -92,6 +97,13 @@ export function NotesSidebar() {
         open={searchDialogOpen}
         onOpenChange={setSearchDialogOpen}
         userId={effectiveUserId}
+      />
+
+      <DeleteNoteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onDelete={handleDeleteNote}
+        title={noteToDelete?.title || ""}
       />
     </div>
   );
