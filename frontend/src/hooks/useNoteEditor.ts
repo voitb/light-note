@@ -1,10 +1,15 @@
 import { useRef, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useNotesStore, type Note } from "@/lib/store/notes-store";
 
 export function useNoteEditor() {
   const { userId, id, noteId: routeNoteId } = useParams<{ userId?: string; id?: string; noteId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if edit mode is requested via query parameter
+  const queryParams = new URLSearchParams(location.search);
+  const shouldEnableEditMode = queryParams.get('edit') === 'true';
 
   const effectiveUserId = userId || "default";
   const currentNoteId = routeNoteId || id;
@@ -23,7 +28,7 @@ export function useNoteEditor() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(currentNoteId === "new");
+  const [isEditing, setIsEditing] = useState(currentNoteId === "new" || shouldEnableEditMode);
   
   // Referencja do pola wprowadzania tagów
   const tagInputRef = useRef<HTMLInputElement>(null);
@@ -82,8 +87,11 @@ export function useNoteEditor() {
             isPinned: foundNote.isPinned
           });
           setCurrentNote(foundNote);
-          // Domyślnie pokazujemy podgląd po wybraniu notatki z sidebara
-          setIsEditing(false);
+          
+          // Check if edit mode should be enabled from URL parameter
+          const params = new URLSearchParams(location.search);
+          const editMode = params.get('edit') === 'true';
+          setIsEditing(editMode);
         } else {
           navigate(`/notes/${effectiveUserId}`);
         }
@@ -91,7 +99,7 @@ export function useNoteEditor() {
     };
     
     handleNoteIdChange();
-  }, [currentNoteId, effectiveUserId, getNote, setCurrentNote, navigate]);
+  }, [currentNoteId, effectiveUserId, getNote, setCurrentNote, navigate, location.search]);
 
   // Oblicz, czy są niezapisane zmiany
   const hasUnsavedChanges = (() => {
@@ -149,7 +157,13 @@ export function useNoteEditor() {
       
       setLastSaved(new Date());
       if (exitEditMode) setIsEditing(false);
-      navigate(`/notes/${effectiveUserId}/${newNoteId}`, { replace: true });
+      
+      // Navigate without the edit parameter if exit edit mode is requested
+      const targetPath = exitEditMode 
+        ? `/notes/${effectiveUserId}/${newNoteId}` 
+        : `/notes/${effectiveUserId}/${newNoteId}?edit=true`;
+      
+      navigate(targetPath, { replace: true });
     } else if (currentNoteId) {
       updateNote(currentNoteId, noteDataToSave);
       
@@ -168,7 +182,14 @@ export function useNoteEditor() {
       }
       
       setLastSaved(new Date());
-      if (exitEditMode) setIsEditing(false);
+      if (exitEditMode) {
+        setIsEditing(false);
+        
+        // If we're exiting edit mode, make sure the URL doesn't have edit=true
+        if (location.search.includes('edit=true')) {
+          navigate(location.pathname, { replace: true });
+        }
+      }
     }
     
     setTimeout(() => setIsSaving(false), 500);
@@ -251,8 +272,20 @@ export function useNoteEditor() {
       console.log("Wyjście z trybu edycji z niezapisanymi zmianami. Warto rozważyć monit o zapisanie.");
     }
     
+    const newEditingState = !isEditing;
+    setIsEditing(newEditingState);
+    
+    // Update URL query parameter based on new editing state
+    if (newEditingState) {
+      // Add edit=true to URL if entering edit mode
+      navigate(`${location.pathname}?edit=true`, { replace: true });
+    } else {
+      // Remove edit=true from URL if exiting edit mode
+      navigate(location.pathname, { replace: true });
+    }
+    
     // Jeśli wchodzimy w tryb edycji, zaktualizuj draft najnowszymi danymi z Zustand store
-    if (!isEditing && noteFromStore) {
+    if (newEditingState && noteFromStore) {
       setDraftNote({
         title: noteFromStore.title,
         content: noteFromStore.content,
@@ -260,8 +293,6 @@ export function useNoteEditor() {
         isPinned: noteFromStore.isPinned
       });
     }
-    
-    setIsEditing(prev => !prev);
   };
 
   const discardChanges = () => {
@@ -284,10 +315,17 @@ export function useNoteEditor() {
     
     // Wyjdź z trybu edycji
     setIsEditing(false);
+    
+    // Remove edit=true from URL if present
+    if (location.search.includes('edit=true')) {
+      navigate(location.pathname, { replace: true });
+    }
   };
 
   const handlePreviewDoubleClick = () => {
     setIsEditing(true);
+    // Update URL to include edit=true
+    navigate(`${location.pathname}?edit=true`, { replace: true });
   };
 
   return {
