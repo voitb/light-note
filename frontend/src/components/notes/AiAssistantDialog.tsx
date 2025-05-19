@@ -57,7 +57,7 @@ const availableModels: ModelInfo[] = [
     performance: "Best",
   },
   {
-    id: "cloud-gpt",
+    id: "cloud-model",
     name: "Cloud",
     description:
       "Premium cloud model. No local resources needed, runs remotely. Best quality responses with minimal device impact.",
@@ -87,7 +87,7 @@ export function AiAssistantDialog({
   const { getCurrentNote, updateNote } = useNotesStore();
 
   const checkSubscription = useCallback(() => {
-    setHasSubscription(false);
+    setHasSubscription(true);
   }, []);
 
   useEffect(() => {

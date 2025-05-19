@@ -16,6 +16,7 @@ export default async function groqRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
+      console.log("request hejaa", request);
       const { prompt } = request.body as { prompt: string };
 
       try {

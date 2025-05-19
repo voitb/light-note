@@ -4,6 +4,7 @@ import {
   type ChatCompletionMessageParam,
   type InitProgressReport,
 } from "@mlc-ai/web-llm";
+import axios from "axios";
 
 const LLM_MODEL_KEY = "llm-model";
 
@@ -25,6 +26,7 @@ export const LLMContext = createContext<{
 
 export const LLMProvider = ({ children }: { children: React.ReactNode }) => {
   const engine = useRef<MLCEngine | null>(null);
+  const [isCloudModel, setIsCloudModel] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +39,11 @@ export const LLMProvider = ({ children }: { children: React.ReactNode }) => {
 
   const loadModel = async (model: string) => {
     setIsLoading(true);
+    if (model === "cloud-model") {
+      setIsLoading(false);
+      setIsCloudModel(true);
+      return;
+    }
     if (engine.current) {
       try {
         await engine.current.reload(model);
@@ -51,6 +58,19 @@ export const LLMProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const askModel = async (messages: ChatCompletionMessageParam[]) => {
+    if (isCloudModel) {
+      console.log("isCloudModel", isCloudModel, import.meta.env.VITE_API_BASE_URL);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/chat`,
+        { messages },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("response", response);
+      return response.data;
+    }
     if (!engine.current) {
       setError("Model not loaded");
       throw new Error("Model not loaded");
@@ -78,11 +98,15 @@ export const LLMProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (engine.current) return;
+    const savedModel = localStorage.getItem(LLM_MODEL_KEY);
     const initialize = async () => {
+      if (savedModel === "cloud-model") {
+        loadModel("cloud-model");
+        return;
+      }
       engine.current = new MLCEngine({ initProgressCallback });
       console.log("Initializing engine", engine.current);
 
-      const savedModel = localStorage.getItem(LLM_MODEL_KEY);
       if (savedModel) {
         loadModel(savedModel);
       }
