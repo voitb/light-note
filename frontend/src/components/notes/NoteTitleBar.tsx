@@ -1,8 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit, Save, Trash, Pin } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Eye, Edit, Save, Trash, Pin, Folder, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Note } from "@/store/notes-store";
+import type { Folder as FolderType } from "@/store/folders-store";
 import React from "react";
 
 export interface NoteTitleBarProps {
@@ -17,6 +19,9 @@ export interface NoteTitleBarProps {
   note: Note | null;
   isPinned: boolean;
   onTogglePin: () => void;
+  folders?: FolderType[];
+  onMoveToFolder?: (noteId: string, folderId?: string) => void;
+  onCreateFolder?: () => void;
 }
 
 export function NoteTitleBar({
@@ -31,6 +36,9 @@ export function NoteTitleBar({
   note,
   isPinned,
   onTogglePin,
+  folders = [],
+  onMoveToFolder,
+  onCreateFolder,
 }: NoteTitleBarProps) {
   return (
     <div className="border-t border-b pb-2 flex justify-between items-start px-4 pt-3">
@@ -96,14 +104,61 @@ export function NoteTitleBar({
           </Button>
         )}
         {note && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive/90 h-8"
-            onClick={onDelete}
-          >
-            <Trash className="h-3.5 w-3.5 md:h-4 md:w-4" />
-          </Button>
+          <div className="flex gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8"
+                >
+                  <MoreHorizontal className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Folder className="h-4 w-4 mr-2" />
+                    Folder Options
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {note.folderId && (
+                      <>
+                        <DropdownMenuItem onClick={() => onMoveToFolder?.(note.id, undefined)}>
+                          <Folder className="h-4 w-4 mr-2" />
+                          Remove from Folder
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    {folders.map((folder) => (
+                      <DropdownMenuItem 
+                        key={folder.id}
+                        onClick={() => onMoveToFolder?.(note.id, folder.id)}
+                      >
+                        <Folder className="h-4 w-4 mr-2" />
+                        {folder.name}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={onCreateFolder}>
+                      <Folder className="h-4 w-4 mr-2" />
+                      Create New Folder
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive/90 h-8 w-8"
+              onClick={onDelete}
+            >
+              <Trash className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            </Button>
+          </div>
         )}
       </div>
     </div>

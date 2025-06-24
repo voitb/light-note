@@ -21,6 +21,7 @@ export function SearchDialog({
 }: SearchDialogProps) {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Note[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const navigate = useNavigate();
 
   const { notes, getNote } = useNotesStore();
@@ -28,11 +29,18 @@ export function SearchDialog({
 
   const recentNotes = getRecentNotes(userId);
 
+  // Reset selected index when switching between search results and recent notes
+  const isShowingRecentNotes = query.trim() === "";
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [isShowingRecentNotes]);
+
   // Reset search when dialog opens
   useEffect(() => {
     if (open) {
       setQuery("");
       setSearchResults([]);
+      setSelectedIndex(0);
     }
   }, [open]);
 
@@ -40,6 +48,7 @@ export function SearchDialog({
   useEffect(() => {
     if (!query.trim()) {
       setSearchResults([]);
+      setSelectedIndex(0);
       return;
     }
 
@@ -54,6 +63,7 @@ export function SearchDialog({
       .slice(0, 10); // Limit to 10 results
 
     setSearchResults(results);
+    setSelectedIndex(0);
 
     // Jeśli znaleźliśmy dokładnie 1 wynik, to mógł to być dokładny wynik wyszukiwania
     // więc dodajmy go do historii
@@ -81,12 +91,35 @@ export function SearchDialog({
     setQuery("");
   };
 
+  // Get current active notes list (search results or recent notes)
+  const activeNotes = !isShowingRecentNotes ? searchResults : recentNotes;
+  
   // Handle keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Escape is already handled by the Dialog component
     // Add Ctrl+Backspace to clear the search
     if (e.ctrlKey && e.key === "Backspace") {
       clearSearch();
+      return;
+    }
+
+    // Handle arrow navigation
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => 
+        prev < activeNotes.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => 
+        prev > 0 ? prev - 1 : activeNotes.length - 1
+      );
+    } else if (e.key === "Enter" && activeNotes.length > 0) {
+      e.preventDefault();
+      const selectedNote = activeNotes[selectedIndex];
+      if (selectedNote) {
+        handleSelectNote(selectedNote.id);
+      }
     }
   };
 
@@ -108,7 +141,7 @@ export function SearchDialog({
         </div>
 
         <ScrollArea className="flex-1 min-h-0">
-          {query.trim() === "" && recentNotes.length > 0 && (
+          {isShowingRecentNotes && recentNotes.length > 0 && (
             <div className="p-2">
               <div className="flex items-center px-2 py-1.5 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3 mr-1.5" />
@@ -116,10 +149,14 @@ export function SearchDialog({
               </div>
 
               <div className="space-y-1 mt-1">
-                {recentNotes.map((note) => (
+                {recentNotes.map((note, index) => (
                   <button
                     key={note.id}
-                    className="w-full text-left flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted/50 transition-colors"
+                    className={`w-full text-left flex items-center gap-3 rounded-md px-3 py-2 transition-colors ${
+                      isShowingRecentNotes && index === selectedIndex
+                        ? "bg-muted/70"
+                        : "hover:bg-muted/50"
+                    }`}
                     onClick={() => handleSelectNote(note.id)}
                   >
                     <FileText className="h-4 w-4 text-muted-foreground" />
@@ -138,14 +175,18 @@ export function SearchDialog({
             </div>
           )}
 
-          {query.trim() !== "" && (
+          {!isShowingRecentNotes && (
             <div className="p-2">
               {searchResults.length > 0 ? (
                 <div className="space-y-1">
-                  {searchResults.map((note) => (
+                  {searchResults.map((note, index) => (
                     <button
                       key={note.id}
-                      className="w-full text-left flex items-start gap-3 rounded-md px-3 py-2 hover:bg-muted/50 transition-colors"
+                      className={`w-full text-left flex items-start gap-3 rounded-md px-3 py-2 transition-colors ${
+                        !isShowingRecentNotes && index === selectedIndex
+                          ? "bg-muted/70"
+                          : "hover:bg-muted/50"
+                      }`}
                       onClick={() => handleSelectNote(note.id)}
                     >
                       <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
@@ -177,7 +218,19 @@ export function SearchDialog({
         </ScrollArea>
 
         <div className="border-t px-4 py-2 text-xs text-muted-foreground flex items-center justify-between">
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
+            <div className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 bg-muted border rounded text-[10px]">
+                ↑↓
+              </kbd>
+              <span>Navigate</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 bg-muted border rounded text-[10px]">
+                Enter
+              </kbd>
+              <span>Select</span>
+            </div>
             <div className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 bg-muted border rounded text-[10px]">
                 ESC

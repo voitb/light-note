@@ -1,15 +1,20 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNoteEditor } from "@/hooks/useNoteEditor";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { useSaveShortcut } from "@/hooks/useSaveShortcut";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useFolders } from "@/hooks/useFolders";
 import { NoteTitleBar } from "./NoteTitleBar";
 import { NoteTagsBar } from "./NoteTagsBar";
 import { NoteEditorSection } from "./NoteEditorSection";
 import { NoteFooterBar } from "./NoteFooterBar";
 import { DeleteNoteDialog } from "./DeleteNoteDialog";
+import { CreateFolderDialog } from "../folders/CreateFolderDialog";
 
 export function NoteEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [createFolderDialogOpen, setCreateFolderDialogOpen] = useState(false);
+  
   const {
     note,
     title,
@@ -39,12 +44,29 @@ export function NoteEditor() {
     toggleNotePinStatus,
   } = useNoteEditor();
 
+  // Get user ID from note or default
+  const userId = note?.userId || "default";
+  const { folders, moveNoteToFolder } = useFolders(userId);
+
   useUnsavedChangesWarning(hasUnsavedChanges);
   useSaveShortcut({
     onSave: handleSave,
     onClose: toggleEditMode,
     onDiscard: discardChanges,
   });
+
+  useKeyboardShortcuts({
+    onSave: handleSave,
+    onClose: toggleEditMode,
+    onDiscard: discardChanges,
+    onTogglePin: toggleNotePinStatus,
+    onNewFolder: () => setCreateFolderDialogOpen(true),
+    enabled: true
+  });
+
+  const handleMoveToFolder = (noteId: string, folderId?: string) => {
+    moveNoteToFolder(noteId, folderId);
+  };
 
   if (!note && !isEditing) {
     return <div className="p-4">Loading...</div>;
@@ -64,6 +86,9 @@ export function NoteEditor() {
         note={note}
         isPinned={isPinned}
         onTogglePin={toggleNotePinStatus}
+        folders={folders}
+        onMoveToFolder={handleMoveToFolder}
+        onCreateFolder={() => setCreateFolderDialogOpen(true)}
       />
       <NoteTagsBar
         tags={tags}
@@ -91,6 +116,12 @@ export function NoteEditor() {
         onOpenChange={setDeleteDialogOpen}
         onDelete={handleDelete}
         title={title}
+      />
+
+      <CreateFolderDialog
+        open={createFolderDialogOpen}
+        onOpenChange={setCreateFolderDialogOpen}
+        userId={userId}
       />
     </div>
   );

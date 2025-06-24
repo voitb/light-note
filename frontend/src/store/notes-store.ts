@@ -11,6 +11,7 @@ export interface Note {
   tags: string[]
   isPinned: boolean
   isShared?: boolean
+  folderId?: string // ID of the folder this note belongs to
 }
 
 interface NotesState {
@@ -24,6 +25,8 @@ interface NotesState {
   setCurrentNote: (note: Note | null) => void
   getCurrentNote: () => Note | null
   changeNotePin: (id: string, isPinned: boolean) => void
+  moveNoteToFolder: (noteId: string, folderId?: string) => void
+  getNotesByFolder: (userId: string, folderId?: string) => Note[]
 }
 
 type NotesStorePersist = PersistOptions<NotesState, NotesState>
@@ -105,6 +108,33 @@ export const useNotesStore = create<NotesState>()(
             note.id === id ? { ...note, isPinned } : note
           )
         }))
+      },
+
+      moveNoteToFolder: (noteId: string, folderId?: string) => {
+        set((state: NotesState) => ({
+          notes: state.notes.map((note: Note) => 
+            note.id === noteId 
+              ? { 
+                  ...note, 
+                  folderId, 
+                  updatedAt: new Date().toISOString() 
+                } 
+              : note
+          ),
+          currentNote: state.currentNote?.id === noteId 
+            ? { 
+                ...state.currentNote, 
+                folderId, 
+                updatedAt: new Date().toISOString() 
+              } 
+            : state.currentNote
+        }))
+      },
+
+      getNotesByFolder: (userId: string, folderId?: string) => {
+        return get().notes.filter((note: Note) => 
+          note.userId === userId && note.folderId === folderId
+        )
       }
     }),
     persistConfig

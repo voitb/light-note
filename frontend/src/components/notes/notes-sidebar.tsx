@@ -1,7 +1,7 @@
 import React from "react";
 import { useNotesSidebar } from "../../hooks/useNotesSidebar";
 import { NotesSidebarHeader } from "./NotesSidebarHeader";
-import { NotesList } from "./NotesList";
+import { FoldersAndNotesList } from "../folders/FoldersAndNotesList";
 import { TagsSection } from "./TagsSection";
 import { UserProfileSection } from "./UserProfileSection";
 import { SearchDialog } from "./search-dialog";
@@ -65,7 +65,7 @@ export function NotesSidebar() {
         onFilterTagClear={() => setFilterTag(null)}
       />
 
-      <NotesList
+      <FoldersAndNotesList
         filteredNotes={sortedNotes}
         effectiveNoteId={effectiveNoteId}
         onSelectTag={setFilterTag}
