@@ -5,8 +5,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotesStore, type Note } from "../../lib/store/notes-store";
-import { useSearchStore } from "../../lib/store/search-store";
+import { useNotesStore, type Note } from "@/store/notes-store";
+import { useSearchStore } from "@/store/search-store";
 
 interface SearchDialogProps {
   open: boolean;

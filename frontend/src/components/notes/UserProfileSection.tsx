@@ -1,4 +1,3 @@
-import React from "react";
 import { Settings, User as UserIcon, Moon, Sun } from "lucide-react"; // Renamed User to UserIcon to avoid conflict
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -13,8 +12,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import type { User } from "@/lib/store/user-store"; // User type from user-store
-import type { UserPreferences } from "@/lib/store/user-store"; // UserPreferences type
+import type { User } from "@/store/user-store"; // User type from user-store
+import type { UserPreferences } from "@/store/user-store"; // UserPreferences type
 
 export interface UserProfileSectionProps {
   currentUser: User | null;

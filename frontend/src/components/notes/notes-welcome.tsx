@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useNotesStore } from "../../lib/store/notes-store";
+import { useNotesStore } from "@/store/notes-store";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Sparkles, FileUp, Command } from "lucide-react";
 

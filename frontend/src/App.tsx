@@ -1,18 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { RootLayout } from "./components/layout/root-layout";
-import { LandingPage } from "./components/landing-page";
-import { TermsPage } from "./components/terms-page";
-import { PrivacyPage } from "./components/privacy-page";
 import { useEffect } from "react";
-import { setTheme } from "./lib/theme";
-import { useUserStore } from "./lib/store/user-store";
-import { useNotesStore } from "./lib/store/notes-store";
+import { useUserStore } from "./store/user-store";
+import { themeService } from "./services/themeService";
+import { mockDataService } from "./services/mockDataService";
 import { NotesLayout } from "./components/notes/notes-layout";
 import { NoteEditor } from "./components/notes/note-editor";
 import { NotesEmptyState } from "./components/notes/notes-empty-state";
 import { NotesWelcome } from "./components/notes/notes-welcome";
 import { SharedNoteView } from "./components/notes/shared-note-view";
-import { mockNotes } from "./lib/mock-data";
+import { LandingPage, AboutPage, LoginPage, RegisterPage, TermsPage, PrivacyPage, NotFoundPage } from "./pages";
 import "./App.css";
 import { LLMProvider } from "./context/llm/llm-provider";
 
@@ -21,25 +18,12 @@ function App() {
 
   // Apply theme when component mounts or theme changes
   useEffect(() => {
-    setTheme(preferences.theme);
+    themeService.setTheme(preferences.theme);
   }, [preferences.theme]);
 
   // Initialize notes with mock data
   useEffect(() => {
-    const { notes, addNote } = useNotesStore.getState();
-
-    if (notes.length === 0) {
-      // Add all mock notes to the store
-      mockNotes.forEach((note) => {
-        addNote({
-          userId: "default",
-          title: note.title,
-          content: note.content,
-          tags: note.tags,
-          isPinned: note.isPinned,
-        });
-      });
-    }
+    mockDataService.initializeNotes();
   }, []);
 
   return (
@@ -48,36 +32,12 @@ function App() {
         <Routes>
           <Route path="/" element={<RootLayout />}>
             <Route index element={<LandingPage />} />
-            <Route
-              path="about"
-              element={
-                <div className="w-full py-10 px-4">
-                  About Page (Coming Soon)
-                </div>
-              }
-            />
-            <Route
-              path="login"
-              element={
-                <div className="w-full py-10 px-4">
-                  Login Page (Coming Soon)
-                </div>
-              }
-            />
-            <Route
-              path="register"
-              element={
-                <div className="w-full py-10 px-4">
-                  Register Page (Coming Soon)
-                </div>
-              }
-            />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
             <Route path="terms" element={<TermsPage />} />
             <Route path="privacy" element={<PrivacyPage />} />
-            <Route
-              path="*"
-              element={<div className="w-full py-10 px-4">404 - Not Found</div>}
-            />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           {/* Notes Application Routes */}

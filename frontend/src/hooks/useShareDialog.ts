@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNotesStore } from "@/lib/store/notes-store";
+import { useNotesStore } from "@/store/notes-store";
 
 export function useShareDialog() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);

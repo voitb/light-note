@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useNotesStore, type Note } from "@/lib/store/notes-store";
+import { useNotesStore, type Note } from "@/store/notes-store";
 
 export function useNoteEditor() {
   const { userId, id, noteId: routeNoteId } = useParams<{ userId?: string; id?: string; noteId?: string }>();
@@ -23,17 +23,17 @@ export function useNoteEditor() {
     currentNote: noteFromStore 
   } = useNotesStore();
 
-  // Lokalne tymczasowe stany tylko dla UI
+  // Local temporary states for UI only
   const [newTag, setNewTag] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(currentNoteId === "new" || shouldEnableEditMode);
   
-  // Referencja do pola wprowadzania tagów
+  // Reference to the tag input field
   const tagInputRef = useRef<HTMLInputElement>(null);
 
-  // Lokalny stan formularza (tymczasowy, niezapisany w Zustand)
+  // Local form state (temporary, not saved in Zustand)
   const [draftNote, setDraftNote] = useState<Partial<Note>>(() => {
     if (currentNoteId === "new") {
       return {
@@ -60,10 +60,10 @@ export function useNoteEditor() {
     return {};
   });
 
-  // Efekt odpowiedzialny za ładowanie notatki, gdy zmienia się currentNoteId
-  // Dzięki temu edytor zaktualizuje się po kliknięciu w inną notatkę w sidebarze
+  // Effect responsible for loading note when currentNoteId changes
+  // This ensures the editor updates after clicking another note in the sidebar
   useEffect(() => {
-    // Pomijamy inicjalizację początkową - ta jest już obsłużona w useState wyżej
+    // Skip initial initialization - this is already handled in useState above
     const handleNoteIdChange = () => {
       if (currentNoteId === "new") {
         setDraftNote({
@@ -101,7 +101,7 @@ export function useNoteEditor() {
     handleNoteIdChange();
   }, [currentNoteId, effectiveUserId, getNote, setCurrentNote, navigate, location.search]);
 
-  // Oblicz, czy są niezapisane zmiany
+  // Calculate whether there are unsaved changes
   const hasUnsavedChanges = (() => {
     if (currentNoteId === "new") {
       return (
@@ -124,7 +124,7 @@ export function useNoteEditor() {
   const saveChanges = (updatedFields: Partial<Omit<Note, 'id' | 'createdAt' | 'updatedAt'>>, exitEditMode = true) => {
     setIsSaving(true);
     
-    // Połącz aktualne wartości draftu z podanymi aktualizacjami
+    // Combine current draft values with provided updates
     const finalTitle = ((updatedFields.title !== undefined ? updatedFields.title : draftNote.title) || "").trim() || "Untitled note";
     const finalContent = updatedFields.content !== undefined ? updatedFields.content : draftNote.content || "";
     const finalTags = updatedFields.tags !== undefined ? updatedFields.tags : draftNote.tags || [];
@@ -141,7 +141,7 @@ export function useNoteEditor() {
     if (currentNoteId === "new") {
       const newNoteId = addNote(noteDataToSave);
       
-      // Aktualizuj lokalny stan draftu po zapisie
+      // Update local draft state after saving
       setDraftNote({
         title: finalTitle,
         content: finalContent,
@@ -149,7 +149,7 @@ export function useNoteEditor() {
         isPinned: finalIsPinned
       });
       
-      // Pobierz zapisaną notatkę i ustaw jako current
+      // Get saved note and set as current
       const savedNote = getNote(newNoteId);
       if (savedNote) {
         setCurrentNote(savedNote);
@@ -167,7 +167,7 @@ export function useNoteEditor() {
     } else if (currentNoteId) {
       updateNote(currentNoteId, noteDataToSave);
       
-      // Aktualizuj lokalny stan draftu po zapisie
+      // Update local draft state after saving
       setDraftNote({
         title: finalTitle,
         content: finalContent,
@@ -175,7 +175,7 @@ export function useNoteEditor() {
         isPinned: finalIsPinned
       });
       
-      // Pobierz zaktualizowaną notatkę i ustaw jako current
+      // Get updated note and set as current
       const updatedNote = getNote(currentNoteId);
       if (updatedNote) {
         setCurrentNote(updatedNote);
@@ -208,16 +208,16 @@ export function useNoteEditor() {
   };
 
   const toggleNotePinStatus = () => {
-    // Najpierw aktualizujemy lokalny stan draftu
+    // First update the local draft state
     const newPinnedState = !(draftNote.isPinned || false);
     setDraftNote(prev => ({ ...prev, isPinned: newPinnedState }));
     
-    // Następnie od razu zapisujemy zmiany bez wychodzenia z trybu edycji
-    // Używamy { isPinned: newPinnedState } jako updatedFields, aby zachować inne zmiany w draftNote
+    // Then immediately save changes without exiting edit mode
+    // Use { isPinned: newPinnedState } as updatedFields to preserve other changes in draftNote
     if (currentNoteId && currentNoteId !== "new") {
       saveChanges({ isPinned: newPinnedState }, false);
     } else if (currentNoteId === "new" && hasUnsavedChanges) {
-      // Jeśli to nowa notatka z niezapisanymi zmianami, zapisujemy całą notatkę
+      // If this is a new note with unsaved changes, save the entire note
       saveChanges({ 
         title: draftNote.title,
         content: draftNote.content,
@@ -269,7 +269,7 @@ export function useNoteEditor() {
 
   const toggleEditMode = () => {
     if (isEditing && hasUnsavedChanges) {
-      console.log("Wyjście z trybu edycji z niezapisanymi zmianami. Warto rozważyć monit o zapisanie.");
+      console.log("Exiting edit mode with unsaved changes. Consider prompting to save.");
     }
     
     const newEditingState = !isEditing;
@@ -284,7 +284,7 @@ export function useNoteEditor() {
       navigate(location.pathname, { replace: true });
     }
     
-    // Jeśli wchodzimy w tryb edycji, zaktualizuj draft najnowszymi danymi z Zustand store
+    // If entering edit mode, update draft with latest data from Zustand store
     if (newEditingState && noteFromStore) {
       setDraftNote({
         title: noteFromStore.title,
@@ -296,7 +296,7 @@ export function useNoteEditor() {
   };
 
   const discardChanges = () => {
-    // Przywróć oryginalny stan notatki
+    // Restore original note state
     if (noteFromStore) {
       setDraftNote({
         title: noteFromStore.title,
@@ -313,7 +313,7 @@ export function useNoteEditor() {
       });
     }
     
-    // Wyjdź z trybu edycji
+    // Exit edit mode
     setIsEditing(false);
     
     // Remove edit=true from URL if present

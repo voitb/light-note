@@ -3,7 +3,7 @@ import { FolderClosed } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { NoteItem } from './NoteItem'; // NoteItemProps is used by NoteItem, not directly here
-import type { Note } from '@/lib/store/notes-store';
+import type { Note } from '@/store/notes-store';
 
 export interface NotesListProps {
   filteredNotes: Note[];

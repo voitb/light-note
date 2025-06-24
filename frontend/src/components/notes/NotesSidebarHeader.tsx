@@ -1,11 +1,10 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Pin as PinIcon, X, Tag as TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useNotesStore } from "@/lib/store/notes-store";
+import { useNotesStore } from "@/store/notes-store";
 
 export interface NotesSidebarHeaderProps {
   view: "all" | "pinned";

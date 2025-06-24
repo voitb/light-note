@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useNotesStore } from "@/lib/store/notes-store";
+import { useNotesStore } from "@/store/notes-store";
 
 interface NoteHeaderProps {
   isMobile: boolean;

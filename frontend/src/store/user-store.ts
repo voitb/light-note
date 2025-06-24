@@ -36,12 +36,16 @@ const persistConfig: UserStorePersist = {
   partialize: (state) => ({
     currentUser: state.currentUser,
     preferences: state.preferences,
+    isAuthenticated: state.isAuthenticated,
+    setUser: state.setUser,
+    updatePreferences: state.updatePreferences,
+    logout: state.logout,
   }),
 }
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       currentUser: null,
       preferences: { ...defaultPreferences },
       isAuthenticated: false,

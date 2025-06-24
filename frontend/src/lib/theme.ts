@@ -1,4 +1,4 @@
-import { useUserStore } from './store/user-store';
+import { useUserStore } from '../store/user-store';
 
 export type Theme = 'dark' | 'light' | 'system'
 

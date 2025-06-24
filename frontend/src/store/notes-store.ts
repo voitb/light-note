@@ -23,6 +23,7 @@ interface NotesState {
   getNotesByUser: (userId: string) => Note[]
   setCurrentNote: (note: Note | null) => void
   getCurrentNote: () => Note | null
+  changeNotePin: (id: string, isPinned: boolean) => void
 }
 
 type NotesStorePersist = PersistOptions<NotesState, NotesState>

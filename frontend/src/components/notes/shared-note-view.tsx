@@ -4,8 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, Tag as TagIcon, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useNotesStore } from '@/lib/store/notes-store';
-import { useUserStore } from '@/lib/store/user-store';
+import { useNotesStore } from '@/store/notes-store';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Logo } from '@/components/logo';
@@ -17,7 +16,6 @@ export function SharedNoteView() {
   
   // Get note from the store
   const { getNote } = useNotesStore();
-  const { currentUser } = useUserStore();
   const note = noteId ? getNote(noteId) : undefined;
   
   useEffect(() => {

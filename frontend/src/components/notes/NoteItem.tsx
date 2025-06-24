@@ -3,7 +3,7 @@ import { Pin, Clock, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { Note } from "@/lib/store/notes-store"; // Ensure Note type is imported
+import type { Note } from "@/store/notes-store"; // Ensure Note type is imported
 import React from "react";
 
 export interface NoteItemProps {

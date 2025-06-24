@@ -1,8 +1,8 @@
 import { FileText, Plus, Sparkles, FileUp, Command } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useNotesStore } from "../../lib/store/notes-store";
-import { useUserStore } from "../../lib/store/user-store";
+import { useNotesStore } from "@/store/notes-store";
+import { useUserStore } from "@/store/user-store";
 
 export function NotesEmptyState() {
   const { currentUser } = useUserStore();

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLLMProvider } from "@/hooks/use-llm-provider";
-import { useNotesStore } from "@/lib/store/notes-store";
+import { useNotesStore } from "@/store/notes-store";
 import type { ChatCompletionMessageParam } from "@mlc-ai/web-llm";
 
 interface AiFeature {

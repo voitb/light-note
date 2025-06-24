@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Save, Trash, Pin } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Note } from "@/lib/store/notes-store";
+import type { Note } from "@/store/notes-store";
 import React from "react";
 
 export interface NoteTitleBarProps {

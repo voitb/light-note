@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useNotesStore, type Note } from '@/lib/store/notes-store';
-import { useUserStore } from '@/lib/store/user-store';
+import { useNotesStore, type Note } from '@/store/notes-store';
+import { useUserStore } from '@/store/user-store';
 
 export function useNotesSidebar() {
   const { id, userId, noteId } = useParams();

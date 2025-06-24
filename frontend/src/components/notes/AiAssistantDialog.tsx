@@ -13,7 +13,7 @@ import { ModelSelectionScreen } from "./ai/ModelSelectionScreen";
 import { AiAssistanceTab } from "./ai/AiAssistanceTab";
 import { type ModelInfo } from "./ai/ModelCard";
 import { useLLMProvider } from "@/hooks/use-llm-provider";
-import { useNotesStore } from "@/lib/store/notes-store";
+import { useNotesStore } from "@/store/notes-store";
 
 const LLM_MODEL_KEY = "llm-model";
 
